@@ -1,56 +1,76 @@
-document.addEventListener('DOMContentLoaded', function(){
-    const form = document.getElementById('form-tel');
-    form.addEventListener('submit', formTelSend);
+document.addEventListener('DOMContentLoaded', function() {
 
-    async function formTelSend(e) {
-        e.preventDefault();
-
-        let error = formValidate(form)
-
-
-
-        if(error === 0 ){
-
-            form.submit()
-        }else{
-            alert('Заполните обязательные поля')
+    // Класс формы
+    class CustomForm {
+        // Получение формы по id элемента
+        constructor(id) {
+            this.form = document.getElementById(id)
         }
-    }
+        
+        // Добавляет класс _error элементу поля ввода
+        formAddError(input){
+            input.classList.add('_error');
+        }
 
-    function formValidate(form){
-        let error = 0;
-        let formReq = document.querySelectorAll('._req');
+        // Убирает класс _error элементу поля ввода
+        formRemoveError(input){
+            input.classList.remove('_error');
+        }
 
-        for(let i = 0; i < formReq.length; i++){
-            const input = formReq[i]
-            formRemoveError(input);
-
+        // Проверяет возвращает кол-во ошибок
+        formValidate() {
             
-            if (input.getAttribute('type') === 'checkbox' && input.checked === false){
-                formAddError(input);
-                error++;
-            }else{
-                if(input.value === ''){
-                    formAddError(input);
+            // Кол-во ошибок и список обязательных полей (с классом _req)
+            let error = 0;
+            let formReq = this.form.querySelectorAll("._req");
+    
+            for(let i = 0; i < formReq.length; i++){
+                const input = formReq[i]
+                this.formRemoveError(input);
+    
+                // Проверка полей чекбоксов на пустое значение
+                if (input.getAttribute('type') === 'checkbox' && input.checked === false){
+                    this.formAddError(input);
                     error++;
+                }else{
+                    // Проверка остальных полей на пустое значение
+                    if(input.value === ''){
+                        this.formAddError(input);
+                        error++;
+                    }
                 }
             }
+
+            return error
         }
-        return error
-    }
 
-    const formAddError = (input) => {
-        input.classList.add('_error');
-
-    }
-    const formRemoveError = (input) => {
-        input.classList.remove('_error');
-
-    }
+        // Обработка отправки
+        formTelSend(e) {
+            e.preventDefault();
+        
+            // Получение кол-ва ошибок
+            let error = this.formValidate()
     
-});
+            if(error === 0 ){
+                this.form.submit()
+            }else{
+                alert('Заполните обязательные поля')
+            }
+        }
 
+        // Добавление обработчика отправки формы
+        setSubmit() {
+            this.form.addEventListener('submit', this.formTelSend.bind(this));
+        }
 
+    }
+
+    // Пример инициализации
+   const form1 = new CustomForm('form')
+   form1.setSubmit()
+})
+
+// Валидация ввода для полей с номером телефона
 document.addEventListener("DOMContentLoaded", function () {
     var phoneInputs = document.querySelectorAll('input[data-tel-input]');
 
